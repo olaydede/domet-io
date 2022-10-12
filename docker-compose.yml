@@ -11,3 +11,16 @@ services:
     image: 'php:fpm-alpine3.16'
     volumes:
       - ./:/docker
+  domet-io-mariadb:
+    image: mariadb:10.9.3
+    restart: always
+    ports:
+      - "9306:3306"
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DB}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASS}
+    volumes:
+      - ./docker/mariadb/data:/var/lib/mysql
+      - ./docker/mariadb/my.cnf:/etc/mysql/conf.d/my.cnf
