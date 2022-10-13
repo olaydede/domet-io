@@ -3,6 +3,9 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use App\Traits\Entity\BasicEntityTrait;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
@@ -13,10 +16,7 @@ use Symfony\Component\Security\Core\User\UserInterface;
 #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
-    #[ORM\Id]
-    #[ORM\GeneratedValue]
-    #[ORM\Column]
-    private ?int $id = null;
+    use BasicEntityTrait;
 
     #[ORM\Column(length: 180, unique: true)]
     private ?string $email = null;
@@ -25,7 +25,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private array $roles = [];
 
     /**
-     * @var string The hashed password
+     * @var ?string The hashed password
      */
     #[ORM\Column]
     private ?string $password = null;
@@ -36,28 +36,28 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $firstName = null;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $createdAt = null;
+    #[ORM\OneToMany(mappedBy: 'User', targetEntity: Client::class, orphanRemoval: true)]
+    private Collection $clients;
 
-    #[ORM\Column]
-    private ?\DateTimeImmutable $modifiedAt = null;
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Task::class)]
+    private Collection $authoredTasks;
 
-    #[ORM\PrePersist]
-    public function onPrePersist()
+    #[ORM\OneToMany(mappedBy: 'author', targetEntity: Task::class)]
+    private Collection $authoredProjects;
+
+    #[ORM\OneToMany(mappedBy: 'assignee', targetEntity: Task::class)]
+    private Collection $assignedTasks;
+
+    #[ORM\OneToMany(mappedBy: 'user', targetEntity: Domet::class, orphanRemoval: true)]
+    private Collection $domets;
+
+    public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable('now');
-        $this->modifiedAt = new \DateTimeImmutable('now');
-    }
-
-    #[ORM\PreUpdate]
-    public function onPreUpdate()
-    {
-        $this->modifiedAt = new \DateTimeImmutable('now');
-    }
-
-    public function getId(): ?int
-    {
-        return $this->id;
+        $this->clients = new ArrayCollection();
+        $this->authoredTasks = new ArrayCollection();
+        $this->authoredProjects = new ArrayCollection();
+        $this->assignedTasks = new ArrayCollection();
+        $this->domets = new ArrayCollection();
     }
 
     public function getEmail(): ?string
@@ -149,26 +149,151 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    /**
+     * @return Collection<int, Client>
+     */
+    public function getClients(): Collection
     {
-        return $this->createdAt;
+        return $this->clients;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    public function addClient(Client $client): self
     {
-        $this->createdAt = $createdAt;
+        if (!$this->clients->contains($client)) {
+            $this->clients->add($client);
+            $client->setUser($this);
+        }
 
         return $this;
     }
 
-    public function getModifiedAt(): ?\DateTimeImmutable
+    public function removeClient(Client $client): self
     {
-        return $this->modifiedAt;
+        if ($this->clients->removeElement($client)) {
+            // set the owning side to null (unless already changed)
+            if ($client->getUser() === $this) {
+                $client->setUser(null);
+            }
+        }
+
+        return $this;
     }
 
-    public function setModifiedAt(\DateTimeImmutable $modifiedAt): self
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getAuthoredTasks(): Collection
     {
-        $this->modifiedAt = $modifiedAt;
+        return $this->authoredTasks;
+    }
+
+    public function addAuthoredTask(Task $authoredTask): self
+    {
+        if (!$this->authoredTasks->contains($authoredTask)) {
+            $this->authoredTasks->add($authoredTask);
+            $authoredTask->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAuthoredTask(Task $authoredTask): self
+    {
+        if ($this->authoredTasks->removeElement($authoredTask)) {
+            // set the owning side to null (unless already changed)
+            if ($authoredTask->getAuthor() === $this) {
+                $authoredTask->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getAuthoredProjects(): Collection
+    {
+        return $this->authoredProjects;
+    }
+
+    public function addAuthoredProject(Project $authoredProject): self
+    {
+        if (!$this->authoredProjects->contains($authoredProject)) {
+            $this->authoredProjects->add($authoredProject);
+            $authoredProject->setAuthor($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAuthoredProject(Project $authoredProject): self
+    {
+        if ($this->authoredProjects->removeElement($authoredProject)) {
+            if ($authoredProject->getAuthor() === $this) {
+                $authoredProject->setAuthor(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Task>
+     */
+    public function getAssignedTasks(): Collection
+    {
+        return $this->assignedTasks;
+    }
+
+    public function addAssignedTask(Task $assignedTask): self
+    {
+        if (!$this->assignedTasks->contains($assignedTask)) {
+            $this->assignedTasks->add($assignedTask);
+            $assignedTask->setAssignee($this);
+        }
+
+        return $this;
+    }
+
+    public function removeAssignedTask(Task $assignedTask): self
+    {
+        if ($this->assignedTasks->removeElement($assignedTask)) {
+            // set the owning side to null (unless already changed)
+            if ($assignedTask->getAssignee() === $this) {
+                $assignedTask->setAssignee(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Domet>
+     */
+    public function getDomets(): Collection
+    {
+        return $this->domets;
+    }
+
+    public function addDomet(Domet $domet): self
+    {
+        if (!$this->domets->contains($domet)) {
+            $this->domets->add($domet);
+            $domet->setUser($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDomet(Domet $domet): self
+    {
+        if ($this->domets->removeElement($domet)) {
+            // set the owning side to null (unless already changed)
+            if ($domet->getUser() === $this) {
+                $domet->setUser(null);
+            }
+        }
 
         return $this;
     }

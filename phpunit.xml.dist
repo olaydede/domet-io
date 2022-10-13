@@ -16,10 +16,18 @@
         <server name="SYMFONY_PHPUNIT_REMOVE" value="" />
         <server name="SYMFONY_PHPUNIT_VERSION" value="9.5" />
     </php>
-
+    <listeners>
+        <listener class="\DAMA\DoctrineTestBundle\PHPUnit\PHPUnitListener" />
+    </listeners>
     <testsuites>
         <testsuite name="Project Test Suite">
             <directory>tests</directory>
+        </testsuite>
+        <testsuite name="Unit Tests">
+            <directory>tests/Unit</directory>
+        </testsuite>
+        <testsuite name="Unit Tests - Controllers">
+            <directory>tests/Unit/Controller</directory>
         </testsuite>
     </testsuites>
 
