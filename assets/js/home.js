@@ -1,4 +1,8 @@
 import $ from 'jquery';
+import Routing from 'fos-router';
+
+console.log(Routing.generate('home'));
+
 const CONTAINER_BUSY_STATE = 'busy';
 const CONTAINER_PAUSED_STATE = 'paused';
 var activeDomet = undefined;

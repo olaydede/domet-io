@@ -8,7 +8,7 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class HomeController extends AbstractController
 {
-    #[Route('/', name:'home')]
+    #[Route('/', name:'home', options: ['expose' => true])]
     public function index(TaskRepository $taskRepository)
     {
         $tasks = $taskRepository->findBy(['author' => $this->getUser()], ['id' => 'DESC']);
