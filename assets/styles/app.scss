@@ -1,6 +1,12 @@
 $body-bg: #FBAB7E;
 $body-color: #FFFFFF;
+$gradient: linear-gradient(135deg, #F7CE68 0%, #FBAB7E 100%);
+
 /* Import bootstrap */
 @import 'bootstrap/scss/bootstrap';
 /* Import FontAwesome */
 @import '@fortawesome/fontawesome-free/scss/fontawesome';
+
+.domet-inactive {
+  opacity: 0.6;
+}
