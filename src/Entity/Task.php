@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Enum\TaskType;
 use App\Repository\TaskRepository;
 use App\Traits\Entity\BasicEntityTrait;
+use App\Traits\Entity\SoftDeletableEntityTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
@@ -15,6 +16,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Task
 {
     use BasicEntityTrait;
+    use SoftDeletableEntityTrait;
 
     #[ORM\Column(length: 255)]
     private ?string $title = null;
@@ -146,7 +148,16 @@ class Task
 
     public function getColor(): string
     {
-        return $this->project->getColor() ??
-            '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+        return $this->project->getColor() ?? $this->getRandomColor();
     }
+
+    public function getRandomColor()
+    {
+        if (is_null($this->tempColor)) {
+            $this->tempColor = '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
+        }
+        return $this->tempColor;
+    }
+
+    public $tempColor = null;
 }

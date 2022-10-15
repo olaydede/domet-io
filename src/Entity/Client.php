@@ -4,6 +4,7 @@ namespace App\Entity;
 
 use App\Repository\ClientRepository;
 use App\Traits\Entity\BasicEntityTrait;
+use App\Traits\Entity\SoftDeletableEntityTrait;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
@@ -13,6 +14,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Client
 {
     use BasicEntityTrait;
+    use SoftDeletableEntityTrait;
 
     #[ORM\Column(length: 255)]
     private ?string $name = null;

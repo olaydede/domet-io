@@ -3,7 +3,9 @@
 namespace App\Repository;
 
 use App\Entity\Domet;
+use App\Entity\Task;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
@@ -37,6 +39,21 @@ class DometRepository extends ServiceEntityRepository
         if ($flush) {
             $this->getEntityManager()->flush();
         }
+    }
+
+    /**
+     * @param Task $task
+     * @return Domet|null
+     * @throws NonUniqueResultException
+     */
+    public function findLatestByTask(Task $task): null|Domet
+    {
+        return $this->createQueryBuilder('d')
+            ->where('d.task = :task')
+            ->orderBy('d.createdAt', 'DESC')
+            ->setParameter('task', $task)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 
 //    /**

@@ -2,6 +2,7 @@
 namespace App\DataFixtures;
 
 use App\Entity\Task;
+use App\Enum\TaskType;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Persistence\ObjectManager;
@@ -32,7 +33,7 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
                     ->setDescription('Dummy task. No desription here.')
                     ->setAuthor($this->getReference(UserFixtures::USER_REFERENCE))
                     ->setProject($this->getReference('project-'.$i))
-                    ->setTaskType('REGULAR');
+                    ->setTaskType(TaskType::REGULAR);
                 $manager->persist($task);
             }
         }
