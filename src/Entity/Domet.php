@@ -2,12 +2,14 @@
 
 namespace App\Entity;
 
+use App\Enum\DometType;
 use App\Repository\DometRepository;
 use App\Traits\Entity\BasicEntityTrait;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DometRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Domet
 {
     use BasicEntityTrait;
@@ -20,7 +22,7 @@ class Domet
     private ?User $user = null;
 
     #[ORM\Column(length: 50)]
-    private ?string $dometType = null;
+    private string $dometType;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $beginDate = null;
@@ -52,14 +54,14 @@ class Domet
         return $this;
     }
 
-    public function getDometType(): ?string
+    public function getDometType(): DometType
     {
-        return $this->dometType;
+        return DometType::from($this->dometType);
     }
 
-    public function setDometType(string $dometType): self
+    public function setDometType(DometType $dometType): self
     {
-        $this->dometType = $dometType;
+        $this->dometType = $dometType->name;
 
         return $this;
     }

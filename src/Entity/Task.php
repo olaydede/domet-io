@@ -2,6 +2,7 @@
 
 namespace App\Entity;
 
+use App\Enum\TaskType;
 use App\Repository\TaskRepository;
 use App\Traits\Entity\BasicEntityTrait;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -10,6 +11,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: TaskRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class Task
 {
     use BasicEntityTrait;
@@ -21,7 +23,7 @@ class Task
     private ?string $description = null;
 
     #[ORM\Column(length: 50)]
-    private ?string $taskType = null;
+    private string $taskType;
 
     #[ORM\ManyToOne(inversedBy: 'tasks')]
     private ?Project $project = null;
@@ -64,14 +66,14 @@ class Task
         return $this;
     }
 
-    public function getTaskType(): ?string
+    public function getTaskType(): TaskType
     {
-        return $this->taskType;
+        return TaskType::from($this->taskType);
     }
 
-    public function setTaskType(string $taskType): self
+    public function setTaskType(TaskType $taskType): self
     {
-        $this->taskType = $taskType;
+        $this->taskType = $taskType->name;
 
         return $this;
     }
@@ -140,5 +142,11 @@ class Task
         }
 
         return $this;
+    }
+
+    public function getColor(): string
+    {
+        return $this->project->getColor() ??
+            '#' . str_pad(dechex(mt_rand(0, 0xFFFFFF)), 6, '0', STR_PAD_LEFT);
     }
 }
