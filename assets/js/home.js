@@ -1,8 +1,9 @@
+// Imports
 import $ from 'jquery';
 import Routing from 'fos-router';
+import axios from "axios";
 
-console.log(Routing.generate('home'));
-
+// Setup
 const CONTAINER_BUSY_STATE = 'busy';
 const CONTAINER_PAUSED_STATE = 'paused';
 var activeDomet = undefined;
@@ -10,6 +11,7 @@ var buttonsound = new Audio('/button-sfx.mp3');
 var alarmsound = new Audio('/alarm-sfx.mp3');
 alarmsound.volume = 0.6;
 
+// Show or hide the counter container
 $(".counter-parent").on({
     mouseenter: function () {
         $(this).find('.counter-container').fadeIn(100);
@@ -29,10 +31,10 @@ function isCounterContainerPaused(container)
     return false;
 }
 
+// Start the functionality of starting or stopping a domet
 $(".counter-parent").on('click', function() {
     handleContainerOrActionButtonClick($(this).find('.counter-container'));
 });
-
 $(".counter-play-button").on('click', function(e) {
     handleContainerOrActionButtonClick($(this).closest('.counter-container'));
     e.stopPropagation(); // Prevent propagating to ancestor!
@@ -64,6 +66,7 @@ function completeDomet(container)
     container.data('task-time-remaining', container.data('default-task-time'));
     stopDomet(container);
     container.find('.counter-icon').removeClass('fa-pause').removeClass('fa-play').addClass('fa-rotate');
+    container.closest('.counter-parent').find('.progress').css("width", "0%");
     cleanup();
 }
 
@@ -81,7 +84,13 @@ function startDomet(container)
         }
     })
     // Do an ajax call to start a Domet
-    console.log('calling to start a domet for task ' + containerTaskId);
+    axios.get(Routing.generate('domet_add', {'task': containerTaskId}))
+        .then(function (response) {
+            console.log(response.data);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
     // Change the state to busy
     changeContainerState(container, CONTAINER_BUSY_STATE);
     // Change parent
@@ -141,6 +150,7 @@ function startCounter(container)
 {
     var destination = container.find('.counter-digits');
     var timeRemaining = container.data('task-time-remaining');
+    var defaultTaskTime = container.data('default-task-time');
     if (timeRemaining === undefined) {
         timeRemaining = 30 * 60 * 1000;
     }
@@ -152,6 +162,7 @@ function startCounter(container)
             destination.html(countdown.toISOString().substring(14, 22).replace(".", ":"));
             countdown.setMilliseconds(countdown.getMilliseconds() - 10);
             container.data('task-time-remaining', countdown.getTime());
+            updateProgressBar(container, countdown.getTime(), defaultTaskTime);
         } else {
             if (! isCounterContainerPaused(container)) {
                 completeDomet(container);
@@ -159,4 +170,10 @@ function startCounter(container)
             clearInterval(timer);
         }
     }, 10);
+}
+
+function updateProgressBar(container, timeRemaining, defaultTime)
+{
+    var percentage = Math.floor((((defaultTime - timeRemaining) / defaultTime) * 100));
+    container.closest('.counter-parent').find('.progress').css("width", percentage+"%");
 }

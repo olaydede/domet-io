@@ -12,14 +12,15 @@
         {% for task in tasks %}
             <div class="col">
                 <div class="row h-100">
-                    <div class="counter-parent col bg- p-3 rounded-2 align-self-stretch" role="button" style="background-color: {{ task.color }};">
+                    <div class="counter-parent col bg-secondary p-3 rounded-2 align-self-stretch" role="button" style="background-color: {{ task.color }} !important;">
+                        <div class="progress bg-light" style="height: 3px; width: 0%; transition:width 1s ease;"></div>
                         <div class="row h-100 row-cols-1">
                             <div class="col align-self-start">
                                 <h2>{{ task.title }}</h2>
                                 <small><i><i class="fa-solid fa-house fa-xs"></i> {{ task.project.title }}</i></small><br />
                             </div>
                             <div class="col align-self-end">
-                                {% include "domet/counter.html.twig" with { task: task, defaultTaskDuration: 30 * 60 * 1000} %}
+                                {% include "domet/counter.html.twig" with { task: task, defaultTaskDuration: 1 * 60 * 1000} %}
                             </div>
                         </div>
                     </div>
