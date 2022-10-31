@@ -1,4 +1,4 @@
-<div class="counter-container" style="display: none;" data-state="paused" data-task-id="{{ task.id }}" data-task-time-remaining="{% if task.timeRemaining is defined %}{{ task.timeRemaining }}{% else %}{{ defaultTaskDuration }}{% endif %}" data-default-task-time="{{ defaultTaskDuration }}">
+<div class="counter-container" style="display: none;" data-state="paused" data-exact-time="0" data-task-id="{{ task.id }}" data-task-time-remaining="{% if task.timeRemaining is defined %}{{ task.timeRemaining }}{% else %}{{ defaultTaskDuration }}{% endif %}" data-default-task-time="{{ defaultTaskDuration }}">
     <div class="row mt-3 align-items-baseline">
         <div class="col-12"></div>
         <div class="col-9 d-grid">

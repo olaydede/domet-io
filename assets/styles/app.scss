@@ -10,3 +10,18 @@ $gradient: linear-gradient(135deg, #F7CE68 0%, #FBAB7E 100%);
 .domet-inactive {
   opacity: 0.6;
 }
+
+$color-brown: #654321;
+$color-brown-100: $color-brown;
+$color-brown-90: lighten($color-brown, 10%);
+$color-brown-80: lighten($color-brown, 20%);
+
+.bg-brown-100 {
+  background-color: $color-brown-100;
+}
+.bg-brown-90 {
+  background-color: $color-brown-90;
+}
+.bg-brown-80 {
+  background-color: $color-brown-80;
+}

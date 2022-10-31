@@ -7,10 +7,11 @@ use App\Enum\DometType;
 use App\Repository\DometRepository;
 use App\Traits\Entity\BasicEntityTrait;
 use App\Traits\Entity\SoftDeletableEntityTrait;
+use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Security\Core\User\UserInterface;
 
 #[ORM\Entity(repositoryClass: DometRepository::class)]
 #[ORM\HasLifecycleCallbacks]
@@ -37,7 +38,8 @@ class Domet
     #[ORM\Column]
     private int $durationLeft = self::DEFAULT_DURATION_MS;
 
-    #[ORM\OneToMany(mappedBy: 'Domet', targetEntity: DometPart::class, orphanRemoval: true)]
+    #[ORM\OneToMany(mappedBy: 'Domet', targetEntity: DometPart::class, cascade: ['persist'], orphanRemoval: true)]
+    #[ORM\OrderBy(['beginDate' => 'DESC'])]
     private Collection $dometParts;
 
     #[ORM\Column(length: 30)]
@@ -69,18 +71,18 @@ class Domet
     }
 
     /**
-     * @return User|null
+     * @return UserInterface|null
      */
-    public function getUser(): ?User
+    public function getUser(): ?UserInterface
     {
         return $this->user;
     }
 
     /**
-     * @param User|null $user
+     * @param UserInterface|null $user
      * @return $this
      */
-    public function setUser(?User $user): self
+    public function setUser(?UserInterface $user): self
     {
         $this->user = $user;
 
@@ -116,10 +118,13 @@ class Domet
 
     /**
      * @param int $duration
+     * @return $this
      */
-    public function setDuration(int $duration): void
+    public function setDuration(int $duration): self
     {
         $this->duration = $duration;
+
+        return $this;
     }
 
     /**
@@ -132,11 +137,13 @@ class Domet
 
     /**
      * @param int $durationLeft
-     * @return void
+     * @return $this
      */
-    public function setDurationLeft(int $durationLeft): void
+    public function setDurationLeft(int $durationLeft): self
     {
         $this->durationLeft = $durationLeft;
+
+        return $this;
     }
 
     /**
@@ -179,5 +186,36 @@ class Domet
         $this->status = $status->value;
 
         return $this;
+    }
+
+    public function stopWorkOn(DateTime $stopDate): self
+    {
+        if ($this->getDometParts()->first() instanceof DometPart &&
+            is_null($this->getDometParts()->first()->getEndDate())) {
+            $this->getDometParts()->first()->setEndDate($stopDate);
+            $this->updateDuration();
+        }
+        return $this;
+    }
+
+    public function startWorkOn(DateTime $startDate): Domet
+    {
+        $this->stopWorkOn($startDate);
+        $this->addDometPart((new DometPart())->setBeginDate($startDate));
+        return $this;
+    }
+
+    private function updateDuration()
+    {
+        $durationLeft = $this->getDuration();
+        foreach ($this->getDometParts() as $dometPart) {
+            $durationLeft -= $dometPart->getDurationInMilliseconds();
+        }
+        if ($durationLeft <= 0) {
+            $this->setStatus(DometStatus::COMPLETE);
+            $this->setDurationLeft(0);
+        } else {
+            $this->setDurationLeft($durationLeft);
+        }
     }
 }

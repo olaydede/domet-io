@@ -6,10 +6,11 @@ import axios from "axios";
 // Setup
 const CONTAINER_BUSY_STATE = 'busy';
 const CONTAINER_PAUSED_STATE = 'paused';
+var latestClickTime = 0;
 var activeDomet = undefined;
 var buttonsound = new Audio('/button-sfx.mp3');
 var alarmsound = new Audio('/alarm-sfx.mp3');
-alarmsound.volume = 0.6;
+alarmsound.volume = 0;
 
 // Show or hide the counter container
 $(".counter-parent").on({
@@ -25,7 +26,7 @@ $(".counter-parent").on({
 
 function isCounterContainerPaused(container)
 {
-    if (container.data('state') == CONTAINER_PAUSED_STATE) {
+    if (container.data('state') === CONTAINER_PAUSED_STATE) {
         return true;
     }
     return false;
@@ -42,6 +43,7 @@ $(".counter-play-button").on('click', function(e) {
 
 function handleContainerOrActionButtonClick(container)
 {
+    latestClickTime = (new Date()).getTime();
     buttonsound.play();
     if (isCounterContainerPaused(container)) {
         startDomet(container);
@@ -62,6 +64,7 @@ function cleanup()
 
 function completeDomet(container)
 {
+    latestClickTime = (new Date()).getTime();
     alarmsound.play();
     container.data('task-time-remaining', container.data('default-task-time'));
     stopDomet(container);
@@ -83,29 +86,36 @@ function startDomet(container)
             }
         }
     })
-    // Do an ajax call to start a Domet
-    axios.get(Routing.generate('domet_add', {'task': containerTaskId}))
-        .then(function (response) {
-            console.log(response.data);
-        })
-        .catch(function (error) {
-            console.log(error);
-        });
     // Change the state to busy
     changeContainerState(container, CONTAINER_BUSY_STATE);
     // Change parent
     activateParentContainer(container);
     // Start the timer
     startCounter(container);
+    // let exactTime = container.data('exact-time');
+    axios.get(Routing.generate('domet_start', {'task': containerTaskId, 'time': latestClickTime/*container.data('exact-time') */}))
+        .then(function (response) {
+            console.log(response.data);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+
     activeDomet = container;
 }
 
 function stopDomet(container)
 {
-    // Do an ajax call?
-    console.log('calling to stop domet for task ' + container.data('task-id'));
     // Change the state
     changeContainerState(container, CONTAINER_PAUSED_STATE);
+    // Do an ajax call?
+    axios.get(Routing.generate('domet_stop', {'task': container.data('task-id'), 'time': latestClickTime/*container.data('exact-time') */}))
+        .then(function (response) {
+            console.log(response);
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
     // Change parent
     deactivateParentContainer(container);
     activeDomet = undefined;
@@ -157,10 +167,12 @@ function startCounter(container)
     // check validity of time-remaining
     var countdown = new Date(0);
     countdown.setMilliseconds(timeRemaining);
+    container.data('exact-time', (new Date()).getTime());
     let timer = setInterval(function () {
         if (! isCounterContainerPaused(container) && countdown >= 0) {
             destination.html(countdown.toISOString().substring(14, 22).replace(".", ":"));
             countdown.setMilliseconds(countdown.getMilliseconds() - 10);
+            container.data('exact-time', (new Date()).getTime());
             container.data('task-time-remaining', countdown.getTime());
             updateProgressBar(container, countdown.getTime(), defaultTaskTime);
         } else {
@@ -169,7 +181,7 @@ function startCounter(container)
             }
             clearInterval(timer);
         }
-    }, 10);
+    }, 10, container, destination);
 }
 
 function updateProgressBar(container, timeRemaining, defaultTime)

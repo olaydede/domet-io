@@ -15,10 +15,10 @@ class DometPart
     use BasicEntityTrait;
     use SoftDeletableEntityTrait;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: 'datetime6')]
     private ?\DateTimeInterface $beginDate = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: 'datetime6', nullable: true)]
     private ?\DateTimeInterface $endDate = null;
 
     #[ORM\ManyToOne(inversedBy: 'dometParts')]
@@ -59,5 +59,13 @@ class DometPart
         $this->Domet = $Domet;
 
         return $this;
+    }
+
+    public function getDurationInMilliseconds(): int
+    {
+        if ($this->getBeginDate() instanceof \DateTime && $this->getEndDate() instanceof \DateTime) {
+            return $this->getEndDate()->format('Uv') - $this->getBeginDate()->format('Uv');
+        }
+        return 0;
     }
 }
