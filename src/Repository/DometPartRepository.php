@@ -32,6 +32,8 @@ class DometPartRepository extends ServiceEntityRepository
 
     public function remove(DometPart $entity, bool $flush = false): void
     {
+        $this->createQueryBuilder();
+
         $this->getEntityManager()->remove($entity);
 
         if ($flush) {
