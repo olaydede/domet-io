@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\Notifier\ChatterInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class DometController extends AbstractController
@@ -35,11 +36,15 @@ class DometController extends AbstractController
         ]);
     }
 
-    #[Route('/domet/start/{task}/{time}', name: 'domet_start', requirements: ['task' => '\d+'], options: ['expose' => true])]
-    public function start(Request $request, Task $task, int $time): JsonResponse
+    #[Route(
+        '/domet/start/{task}/{time}',
+        name: 'domet_start',
+        requirements: ['task' => '\d+'],
+        options: ['expose' => true]
+    )]
+    public function start(Request $request, ChatterInterface $chatter, Task $task, int $time): JsonResponse
     {
-
-        $effectiveDate = \DateTime::createFromFormat('U.u', $time/1000);
+        $effectiveDate = \DateTime::createFromFormat('U.u', $time / 1000);
         // Check if a Domet exists for this Task, if not create
         $domet = $this->dometRepository->findLatestIncompleteDometByTask($task);
         if (! $domet instanceof Domet) {
@@ -66,10 +71,15 @@ class DometController extends AbstractController
         );
     }
 
-    #[Route('/domet/stop/{task}/{time}', name: 'domet_stop', requirements: ['task' => '\d+'], options: ['expose' => true])]
+    #[Route(
+        '/domet/stop/{task}/{time}',
+        name: 'domet_stop',
+        requirements: ['task' => '\d+'],
+        options: ['expose' => true]
+    )]
     public function stop(Request $request, Task $task, int $time): JsonResponse
     {
-        $effectiveDate = \DateTime::createFromFormat('U.u', $time/1000);
+        $effectiveDate = \DateTime::createFromFormat('U.u', $time / 1000);
         // Find appropriate Domet
         $domet = $this->dometRepository->findLatestIncompleteDometByTask($task);
         if (! $domet instanceof Domet) {
