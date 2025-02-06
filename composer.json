@@ -51,7 +51,7 @@
         "symfony/twig-bundle": "*",
         "symfony/validator": "*",
         "symfony/web-link": "*",
-        "symfony/webpack-encore-bundle": "^1.15",
+        "symfony/webpack-encore-bundle": "^2.2",
         "symfony/yaml": "*",
         "twig/extra-bundle": "^2.12|^3.0",
         "twig/twig": "^2.12|^3.0"
@@ -59,6 +59,7 @@
     "config": {
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
+            "phpro/grumphp": true,
             "symfony/flex": true,
             "symfony/runtime": true
         },
@@ -105,7 +106,7 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.4.*"
+            "require": "7.2.*"
         }
     },
     "require-dev": {
@@ -113,6 +114,7 @@
         "doctrine/doctrine-fixtures-bundle": "^3.7",
         "friendsofphp/php-cs-fixer": "^3.68",
         "phpmd/phpmd": "^2.15",
+        "phpro/grumphp": "^2.10",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^9.5",
         "rector/rector": "^2.0",
@@ -122,6 +124,7 @@
         "symfony/debug-bundle": "*",
         "symfony/phpunit-bridge": "^6.1",
         "symfony/stopwatch": "*",
-        "symfony/web-profiler-bundle": "*"
+        "symfony/web-profiler-bundle": "*",
+        "vimeo/psalm": "^6.4"
     }
 }
