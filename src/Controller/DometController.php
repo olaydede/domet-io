@@ -42,7 +42,7 @@ class DometController extends AbstractController
         requirements: ['task' => '\d+'],
         options: ['expose' => true]
     )]
-    public function start(Request $request, ChatterInterface $chatter, Task $task, int $time): JsonResponse
+    public function start(ChatterInterface $chatter, Task $task, int $time): JsonResponse
     {
         $effectiveDate = \DateTime::createFromFormat('U.u', $time / 1000);
         // Check if a Domet exists for this Task, if not create
@@ -77,7 +77,7 @@ class DometController extends AbstractController
         requirements: ['task' => '\d+'],
         options: ['expose' => true]
     )]
-    public function stop(Request $request, Task $task, int $time): JsonResponse
+    public function stop(Task $task, int $time): JsonResponse
     {
         $effectiveDate = \DateTime::createFromFormat('U.u', $time / 1000);
         // Find appropriate Domet
