@@ -24,7 +24,7 @@ class DateTimeMicrosecondsType extends Type
         return 'DATETIME(6)';
     }
 
-    public function convertToPHPValue($value, AbstractPlatform $platform)
+    public function convertToPHPValue($value, AbstractPlatform $platform): mixed
     {
         if ($value === null || $value instanceof DateTimeInterface) {
             return $value;
@@ -52,7 +52,7 @@ class DateTimeMicrosecondsType extends Type
         return self::TYPENAME;
     }
 
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    public function convertToDatabaseValue($value, AbstractPlatform $platform): mixed
     {
         if (null === $value) {
             return $value;
