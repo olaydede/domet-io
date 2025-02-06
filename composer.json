@@ -12,6 +12,7 @@
         "php": ">=8.1",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "amphp/amp": "*",
         "doctrine/annotations": "^1.0",
         "doctrine/doctrine-bundle": "^2.13",
         "doctrine/doctrine-migrations-bundle": "^3.0",
@@ -59,8 +60,7 @@
         "allow-plugins": {
             "composer/package-versions-deprecated": true,
             "symfony/flex": true,
-            "symfony/runtime": true,
-            "phpro/grumphp": true
+            "symfony/runtime": true
         },
         "optimize-autoloader": true,
         "preferred-install": {
@@ -113,7 +113,6 @@
         "doctrine/doctrine-fixtures-bundle": "^3.4",
         "friendsofphp/php-cs-fixer": "^3.68",
         "phpmd/phpmd": "^2.15",
-        "phpro/grumphp": "^1.16",
         "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^9.5",
         "rector/rector": "^2.0",
@@ -123,7 +122,6 @@
         "symfony/debug-bundle": "*",
         "symfony/phpunit-bridge": "^6.1",
         "symfony/stopwatch": "*",
-        "symfony/web-profiler-bundle": "*",
-        "vimeo/psalm": "^4.28"
+        "symfony/web-profiler-bundle": "*"
     }
 }
