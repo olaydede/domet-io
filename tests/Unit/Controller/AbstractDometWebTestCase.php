@@ -1,4 +1,5 @@
 <?php
+
 namespace App\Tests\Unit\Controller;
 
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
@@ -17,6 +18,4 @@ abstract class AbstractDometWebTestCase extends WebTestCase
         $this->client->setServerParameter('HTTP_HOST', $_ENV['APP_DOMAIN']);
         parent::setUp();
     }
-
-
 }

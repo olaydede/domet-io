@@ -4,20 +4,20 @@ namespace App\DBAL;
 
 use DateTime;
 use DateTimeInterface;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\ConversionException;
+use Doctrine\DBAL\Types\Type;
 
 /**
  * Override datetime datatype to support microseconds
  */
 class DateTimeMicrosecondsType extends Type
 {
-    const TYPENAME = 'datetime6'; // modify to match your type name
+    public const TYPENAME = 'datetime6'; // modify to match your type name
 
-    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform)
+    public function getSQLDeclaration(array $fieldDeclaration, AbstractPlatform $platform): string
     {
-        if (isset($fieldDeclaration['version']) && $fieldDeclaration['version'] == true) {
+        if (isset($fieldDeclaration['version']) && $fieldDeclaration['version']) {
             return 'TIMESTAMP';
         }
 
@@ -47,6 +47,11 @@ class DateTimeMicrosecondsType extends Type
         return $val;
     }
 
+    public function getName(): string
+    {
+        return self::TYPENAME;
+    }
+
     public function convertToDatabaseValue($value, AbstractPlatform $platform)
     {
         if (null === $value) {
@@ -62,10 +67,5 @@ class DateTimeMicrosecondsType extends Type
             $this->getName(),
             ['null', 'DateTime']
         );
-    }
-
-    public function getName()
-    {
-        return self::TYPENAME;
     }
 }

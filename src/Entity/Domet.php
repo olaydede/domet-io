@@ -20,7 +20,7 @@ class Domet
     use BasicEntityTrait;
     use SoftDeletableEntityTrait;
 
-    const DEFAULT_DURATION_MS = 30 * 60 * 1000;
+    public const DEFAULT_DURATION_MS = 30 * 60 * 1000;
 
     #[ORM\ManyToOne(inversedBy: 'domets')]
     private ?Task $task = null;
@@ -190,8 +190,10 @@ class Domet
 
     public function stopWorkOn(DateTime $stopDate): self
     {
-        if ($this->getDometParts()->first() instanceof DometPart &&
-            is_null($this->getDometParts()->first()->getEndDate())) {
+        if (
+            $this->getDometParts()->first() instanceof DometPart &&
+            is_null($this->getDometParts()->first()->getEndDate())
+        ) {
             $this->getDometParts()->first()->setEndDate($stopDate);
             $this->updateDuration();
         }

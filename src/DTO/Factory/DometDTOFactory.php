@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTO\Factory;
 
 use App\DTO\DometDTO;

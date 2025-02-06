@@ -1,7 +1,10 @@
 <?php
+
 namespace App\DataFixtures;
 
+use App\Entity\Project;
 use App\Entity\Task;
+use App\Entity\User;
 use App\Enum\TaskType;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
@@ -9,7 +12,7 @@ use Doctrine\Persistence\ObjectManager;
 
 class TaskFixtures extends Fixture implements DependentFixtureInterface
 {
-    public function load(ObjectManager $manager)
+    public function load(ObjectManager $manager): void
     {
         $randomTasks = [
             'Stick to a New Years Resolution For an Entire Year',
@@ -29,10 +32,10 @@ class TaskFixtures extends Fixture implements DependentFixtureInterface
             for ($j = 1; $j <= 3; $j++) {
                 $task = new Task();
                 $task
-                    ->setTitle($randomTasks[($i*$j)-1])
+                    ->setTitle($randomTasks[($i * $j) - 1])
                     ->setDescription('Dummy task. No desription here.')
-                    ->setAuthor($this->getReference(UserFixtures::USER_REFERENCE))
-                    ->setProject($this->getReference('project-'.$i))
+                    ->setAuthor($this->getReference(UserFixtures::USER_REFERENCE, User::class))
+                    ->setProject($this->getReference('project-' . $i, Project::class))
                     ->setTaskType(TaskType::REGULAR);
                 $manager->persist($task);
             }

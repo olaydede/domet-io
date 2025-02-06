@@ -1,4 +1,5 @@
 <?php
+
 namespace App\DTO;
 
 use App\Enum\DometType;
@@ -18,7 +19,7 @@ class DometPreferenceDTO
         $this->durationBreak = $durationBreak;
     }
 
-    public function getDurationPreference(? DometType $dometType = null): int
+    public function getDurationPreference(?DometType $dometType = null): int
     {
         $preferences = [
             DometType::FOCUS->value => $this->durationFocus,
