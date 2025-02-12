@@ -1,26 +1,57 @@
-version: '3'
+networks:
+  domet-network:
+    external: true
+
 services:
-  domet-io-nginx:
+  nginx:
     image: nginx:latest
+    container_name: domet-nginx
     ports:
-      - "8903:80"
+      - "8084:80"
     volumes:
-      - ./docker/nginx.conf:/etc/nginx/conf.d/nginx.conf
-      - ./:/docker
-  domet-io-phpfpm:
-    image: 'php:fpm-alpine3.16'
+      - ./:/var/www/public
+      - ./docker/nginx/default.conf:/etc/nginx/conf.d/default.conf
+    networks:
+      - domet-network
+    depends_on:
+      - php
+      - database
+  php:
+    image: olaydede/php8.3-fpm:latest
+    container_name: domet-php
+    environment:
+      WORKING_DIR: "/var/www/public"
+      WORK_DIR: "/var/www/public"
     volumes:
-      - ./:/docker
-  domet-io-mariadb:
-    image: mariadb:10.9.3
+      - ./:/var/www/public
+    networks:
+      - domet-network
+    depends_on:
+      - database
+  database:
+    image: mysql:latest
+    container_name: domet-database
     restart: always
     ports:
-      - "${MYSQL_PORT}:3306"
+      - "3304:3306"
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DB}
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASS}
     volumes:
-      - ./docker/mariadb/data:/var/lib/mysql
-      - ./docker/mariadb/my.cnf:/etc/mysql/conf.d/my.cnf
+      - ./docker/mysql/data:/var/lib/mysql
+      - ./docker/mysql/my.cnf:/etc/mysql/conf.d/my.cnf
+    networks:
+      - domet-network
+  rabbitmq:
+    image: rabbitmq:3-management
+    container_name: domet-rabbitmq
+    restart: always
+    ports:
+      - "1564:15672"
+    environment:
+      RABBITMQ_DEFAULT_USER: ${RABBITMQ_USER}
+      RABBITMQ_DEFAULT_PASS: ${RABBITMQ_PASS}
+    networks:
+      - domet-network
