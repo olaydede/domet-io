@@ -87,6 +87,7 @@ yarn-error.log
 
 ### docker
 docker/mariadb/data
+docker/mysql/data
 
 ###> phpstan/phpstan ###
 phpstan.neon
